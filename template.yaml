@@ -25,6 +25,11 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+        DailyScheduledNumbersEvent:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: "cron(00 12 * * ? *)"
+            ScheduleExpressionTimezone: UTC
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
