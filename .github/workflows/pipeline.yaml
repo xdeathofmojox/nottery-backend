@@ -14,6 +14,7 @@ env:
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
   TESTING_STACK_NAME: nottery-dev
+  TESTING_STAGE_NAME: dev
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1SG7JFNW5Y24I
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-19QA232WEQ7M5
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-175nozbi2q9h1
@@ -23,6 +24,7 @@ env:
   # TESTING_IMAGE_REPOSITORY = '0123456789.dkr.ecr.region.amazonaws.com/repository-name'
   TESTING_REGION: us-east-1
   PROD_STACK_NAME: nottery-prod
+  PROD_STAGE_NAME: prod
   PROD_PIPELINE_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-prod-pip-PipelineExecutionRole-31MT86F1NGAB
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/aws-sam-cli-managed-prod-CloudFormationExecutionR-STZERB9DZIBM
   PROD_ARTIFACTS_BUCKET: aws-sam-cli-managed-prod-pipeline-artifactsbucket-so1s9rfhyzjc
@@ -105,6 +107,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.TESTING_STAGE_NAME }}
 
   build-and-package:
     if: github.ref == 'refs/heads/main'
@@ -198,6 +201,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.TESTING_STAGE_NAME }}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
@@ -244,3 +248,4 @@ jobs:
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
+            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.PROD_STAGE_NAME }}

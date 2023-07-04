@@ -10,6 +10,11 @@ Globals:
   Function:
     Timeout: 3
 
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+
 Resources:
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -27,6 +32,7 @@ Resources:
             Method: get
         DailyScheduledNumbersEvent:
           Type: ScheduleV2
+          Name: !Sub DailyScheduledNumbersEvent-${Stage}
           Properties:
             ScheduleExpression: "cron(00 12 * * ? *)"
             ScheduleExpressionTimezone: UTC
