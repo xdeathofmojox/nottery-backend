@@ -32,8 +32,8 @@ Resources:
             Method: get
         DailyScheduledNumbersEvent:
           Type: ScheduleV2
-          Name: !Sub DailyScheduledNumbersEvent-${Stage}
           Properties:
+            Name: !Sub DailyScheduledNumbersEvent-${Stage}
             ScheduleExpression: "cron(00 12 * * ? *)"
             ScheduleExpressionTimezone: UTC
 
