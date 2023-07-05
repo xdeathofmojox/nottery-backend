@@ -107,7 +107,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Stage,ParameterValue=${{ env.TESTING_STAGE_NAME }}
+            --parameter-overrides ParameterKey=Stage,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]')
 
   build-and-package:
     if: github.ref == 'refs/heads/main'
