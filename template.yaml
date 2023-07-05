@@ -53,10 +53,10 @@ Resources:
             Path: /winningNumbers
             Method: post
             RestApiId: !Ref NotteryApiDeployment
-        DailyScheduledNumbersEvent:
+        DailyScheduledWinningNumberEvent:
           Type: ScheduleV2
           Properties:
-            Name: !Sub DailyScheduledNumbersEvent-${Stage}
+            Name: !Sub DailyScheduledWinningNumberEvent-${Stage}
             ScheduleExpression: "cron(00 12 * * ? *)"
             ScheduleExpressionTimezone: UTC
 
