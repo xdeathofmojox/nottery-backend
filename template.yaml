@@ -93,6 +93,9 @@ Resources:
     Type: AWS::Serverless::SimpleTable
     Properties:
       TableName: !Sub ${AWS::StackName}-WinningNumbers
+      PrimaryKey:
+        Name: date
+        Type: String
 
 Outputs:
   HelloWorldApi:
