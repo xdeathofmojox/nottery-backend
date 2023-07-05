@@ -23,7 +23,7 @@ function getRandomInt(min, max) {
 
 export const post = async (event, context) => {
     let today = new Date()
-    let dateStr = today.getYear() + "-" + today.getMonth() + "-" + today.getDate();
+    let dateStr = today.toDateString()
 
     let nOne   = getRandomInt(1, 70)
     let nTwo   = getRandomInt(1, 70)
