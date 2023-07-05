@@ -96,11 +96,11 @@ Resources:
 
 Outputs:
   HelloWorldApi:
-    Description: "API Gateway endpoint URL for ${Stage} stage for Hello World function"
+    Description: "API Gateway endpoint URL for Hello World function"
     Value: !Sub "https://${NotteryApiDeployment}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  PostWinningNumbersFunction:
+    Description: "PostWinningNumbers Lambda Function ARN"
+    Value: !GetAtt PostWinningNumbersFunction.Arn
+  GetWinningNumbersFunction:
+    Description: "GetWinningNumbers Lambda Function ARN"
+    Value: !GetAtt GetWinningNumbersFunction.Arn
