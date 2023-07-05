@@ -5,7 +5,6 @@ Description: >
 
   Sample SAM Template for nottery-backend
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
@@ -16,20 +15,44 @@ Parameters:
     Default: dev
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  NotteryApiCertificate:
+    Type: AWS::CertificateManager::Certificate
     Properties:
-      CodeUri: hello-world/
-      Handler: app.lambdaHandler
+      DomainName: !Sub api-${Stage}.nottery.frozen-phoenix.com
+      ValidationMethod: DNS
+
+  NotteryApiDeployment:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Domain:
+        DomainName: !Sub api-${Stage}.nottery.frozen-phoenix.com
+        CertificateArn: !Ref NotteryApiCertificate
+        Route53:
+          HostedZoneName: "frozen-phoenix.com."
+
+  PostWinningNumbersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: winning-numbers/
+      Handler: app.post
       Runtime: nodejs18.x
       Architectures:
         - x86_64
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WinningNumbersTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WinningNumbersTable
+          REGION: !Sub ${AWS::Region}
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        WinningNumbers:
+          Type: Api
           Properties:
-            Path: /hello
-            Method: get
+            Path: /winningNumbers
+            Method: post
+            RestApiId: !Ref NotteryApiDeployment
         DailyScheduledNumbersEvent:
           Type: ScheduleV2
           Properties:
@@ -37,13 +60,44 @@ Resources:
             ScheduleExpression: "cron(00 12 * * ? *)"
             ScheduleExpressionTimezone: UTC
 
+  GetWinningNumbersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: winning-numbers/
+      Handler: app.get
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref WinningNumbersTable
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WinningNumbersTable
+          REGION: !Sub ${AWS::Region}
+      Events:
+        TodaysWinningNumber:
+          Type: Api
+          Properties:
+            Path: /winningNumbers
+            Method: get
+            RestApiId: !Ref NotteryApiDeployment
+        SpecificDatesWinningNumber:
+          Type: Api
+          Properties:
+            Path: /winningNumbers/{date}
+            Method: get
+            RestApiId: !Ref NotteryApiDeployment
+
+  WinningNumbersTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: !Sub ${AWS::StackName}-WinningNumbers
+
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Description: "API Gateway endpoint URL for ${Stage} stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}/hello/"
   HelloWorldFunction:
     Description: "Hello World Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
